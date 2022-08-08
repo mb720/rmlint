@@ -1,0 +1,16 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.9
+    steps:
+      - run: |
+          sudo apt-get update
+          sudo apt-get install scons python3-sphinx gettext python3-setuptools libblkid-dev libelf-dev libglib2.0-dev \
+            libjson-glib-dev python3-pip python3-cffi libffi-dev man-db
+      - checkout
+      - run: |
+          pip install -r test-requirements.txt
+          scons config
+          scons VERBOSE=1 DEBUG=1 O=release
+          RM_TS_PRINT_CMD=1 RM_TS_PEDANTIC=0 nosetests -d -s -v -a '!slow'
